@@ -25,45 +25,46 @@ namespace GetTweet
 
         public void GetByUser(string screen_name)
         {
-            #region ユーザ指定で取得
-            var screenNames = ConfigurationManager.AppSettings["screen_names"];
+            try {
+                #region ユーザ指定で取得
+                var parm = new Dictionary<string, object>();
+                parm["count"] = 10;
+                parm["screen_name"] = screen_name;
 
-            var parm = new Dictionary<string, object>();
-            parm["count"] = 10;
+                var tweets = tokens.Statuses.UserTimeline(parm);
+                #endregion
 
-            parm["screen_name"] = screen_name;
-
-            var tweets = tokens.Statuses.UserTimeline(parm);
-            #endregion
-
-            //所定のファイルに追記する
-            using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
-            {
-                foreach (var tweet in tweets)
+                //所定のファイルに追記する
+                using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
                 {
-                    Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
-                    Console.WriteLine("---------");
-                    sw.WriteLine(replace(tweet.Text));
+                    foreach (var tweet in tweets)
+                    {
+                        Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
+                        Console.WriteLine("---------");
+                        sw.WriteLine(replace(tweet.Text));
+                    }
                 }
             }
+            catch { }
         }
 
         public void GetByKeyword(string keyword)
         {
-            var tweets = tokens.Search.Tweets(count => 10, q => keyword);
+            try {
+                var tweets = tokens.Search.Tweets(count => 10, q => keyword);
 
-            //所定のファイルに追記する
-            using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
-            {
-                foreach (var tweet in tweets)
+                //所定のファイルに追記する
+                using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
                 {
-                    Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
-                    Console.WriteLine("---------");
-                    sw.WriteLine(replace(tweet.Text));
+                    foreach (var tweet in tweets)
+                    {
+                        Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
+                        Console.WriteLine("---------");
+                        sw.WriteLine(replace(tweet.Text));
+                    }
                 }
             }
-
-
+            catch { }
         }
 
         string replace(string text)
