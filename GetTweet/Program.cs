@@ -12,7 +12,6 @@ namespace GetTweet
             tweet.GetFavo();
             #endregion
 
-
             #region ユーザ指定で取得
             var screenNames = ConfigurationManager.AppSettings["screen_names"];
 
@@ -25,6 +24,14 @@ namespace GetTweet
             }
             #endregion
 
+            #region トレンドを取得
+            var trendList = tweet.GetTrend();
+            foreach (var keyword in trendList)
+            {
+                tweet.GetByKeyword(keyword, 5);
+            }
+            #endregion
+
             #region キーワード指定で取得
             var keywords = ConfigurationManager.AppSettings["keywords"];
 
@@ -32,7 +39,7 @@ namespace GetTweet
             {
                 foreach (var keyword in keywords.Split(','))
                 {
-                    tweet.GetByKeyword(keyword);
+                    tweet.GetByKeyword(keyword, 10);
                 }
             }
             #endregion

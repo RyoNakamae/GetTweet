@@ -30,11 +30,10 @@ namespace GetTweet
         /// </summary>
         public void GetFavo()
         {
-
             var parm = new Dictionary<string, object>();
             parm["count"] = 10;
             parm["include_rts"] = false;
-
+            
             //自分のツィートを取得
             var tweets = tokens.Statuses.UserTimeline(parm);
 
@@ -56,6 +55,22 @@ namespace GetTweet
                     writeTweet(sw, tweet);
                 }
             }
+        }
+
+        public List<string> GetTrend()
+        {
+            var parm = new Dictionary<string, object>();
+
+            parm["id"] = 23424856;
+            var t = tokens.Trends.Place(parm);
+
+            var resList = new List<string>();
+            foreach (var trend in t[0].Trends)
+            {
+                resList.Add(trend.Name);
+            }
+
+            return resList;
         }
 
         public void GetByUser(string screen_name)
@@ -81,10 +96,10 @@ namespace GetTweet
             catch { }
         }
 
-        public void GetByKeyword(string keyword)
+        public void GetByKeyword(string keyword,int cnt)
         {
             try {
-                var tweets = tokens.Search.Tweets(count => 10, q => keyword);
+                var tweets = tokens.Search.Tweets(count => cnt, q => keyword);
 
                 //所定のファイルに追記する
                 using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
