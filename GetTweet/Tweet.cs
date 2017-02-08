@@ -124,8 +124,10 @@ namespace GetTweet
 
             Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
             Console.WriteLine("---------");
-            sw.WriteLine(replace(tweet.Text));
+            var text = replace(tweet.Text);
+            if (text.Replace("\r", "").Replace("\n", "").Trim().Length == 0) return;
 
+            sw.WriteLine(text);
         }
 
         string replace(string text)
@@ -133,18 +135,23 @@ namespace GetTweet
             var res = text;
 
             //ハッシュタグ以降をのぞく
-            if (res.Contains("#"))
-            {
-                res = res.Remove(res.IndexOf('#'));
-            }
+            res = remove(res, "#");
+            res = remove(res, "＃");
 
             //リンク以降を除く
-            if (res.Contains("https"))
-            {
-                res = res.Remove(res.IndexOf("https"));
-            }
+            res = remove(res, "https");
 
             return res;
+        }
+
+        string remove(string text,string word)
+        {
+            if (text.Contains(word))
+            {
+                return text.Remove(text.IndexOf(word));
+            }
+            return text;
+
         }
     }
 }
