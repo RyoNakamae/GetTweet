@@ -8,6 +8,11 @@ namespace GetTweet
         {
             var tweet = new Tweet();
 
+            #region ファボられたものを取得する
+            tweet.GetFavo();
+            #endregion
+
+
             #region ユーザ指定で取得
             var screenNames = ConfigurationManager.AppSettings["screen_names"];
 

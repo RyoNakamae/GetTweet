@@ -1,4 +1,5 @@
 ﻿using CoreTweet;
+using CoreTweet.Core;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,6 +24,40 @@ namespace GetTweet
             #endregion
         }
 
+
+        /// <summary>
+        /// 自分のツィートの中でファボられたものを取得する
+        /// </summary>
+        public void GetFavo()
+        {
+
+            var parm = new Dictionary<string, object>();
+            parm["count"] = 10;
+            parm["include_rts"] = false;
+
+            //自分のツィートを取得
+            var tweets = tokens.Statuses.UserTimeline(parm);
+
+            var list = new List<Status>();
+            foreach (var tweet in tweets)
+            {
+                //tweet.FavoriteCountが1以上のものがファぼられたもの
+                if (tweet.FavoriteCount > 0)
+                {
+                    list.Add(tweet);
+                }
+            }
+
+            //所定のファイルに追記する
+            using (StreamWriter sw = new StreamWriter(ConfigurationManager.AppSettings["OutFilePath"], true, Encoding.UTF8))
+            {
+                foreach (var tweet in list)
+                {
+                    writeTweet(sw, tweet);
+                }
+            }
+        }
+
         public void GetByUser(string screen_name)
         {
             try {
@@ -39,9 +74,7 @@ namespace GetTweet
                 {
                     foreach (var tweet in tweets)
                     {
-                        Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
-                        Console.WriteLine("---------");
-                        sw.WriteLine(replace(tweet.Text));
+                        writeTweet(sw, tweet);
                     }
                 }
             }
@@ -58,13 +91,26 @@ namespace GetTweet
                 {
                     foreach (var tweet in tweets)
                     {
-                        Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
-                        Console.WriteLine("---------");
-                        sw.WriteLine(replace(tweet.Text));
+                        writeTweet(sw, tweet);
                     }
                 }
             }
             catch { }
+        }
+
+        void writeTweet(StreamWriter sw, Status tweet)
+        {
+            #region RT,@のものは除外
+            if (tweet.IsRetweeted != null && (bool)tweet.IsRetweeted) return;
+
+            if (tweet.Text.Contains("@")) return;
+            if (tweet.Text.ToUpper().Contains("RT")) return;
+            #endregion
+
+            Console.WriteLine("{0}: {1}", tweet.User.ScreenName, tweet.Text);
+            Console.WriteLine("---------");
+            sw.WriteLine(replace(tweet.Text));
+
         }
 
         string replace(string text)
